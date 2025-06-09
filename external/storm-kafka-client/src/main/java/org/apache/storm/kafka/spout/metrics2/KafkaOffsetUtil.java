@@ -37,7 +37,7 @@ public class KafkaOffsetUtil {
         return beginningOffsets;
     }
 
-    public static Map<TopicPartition, Long> getEndOffsets(Set<TopicPartition> topicPartitions,Supplier<Admin> adminSupplier) {
+    public static Map<TopicPartition, Long> getEndOffsets(Set<TopicPartition> topicPartitions, Supplier<Admin> adminSupplier) {
         Admin admin = adminSupplier.get();
         if (admin == null) {
             LOG.error("Kafka admin object is null, returning 0.");

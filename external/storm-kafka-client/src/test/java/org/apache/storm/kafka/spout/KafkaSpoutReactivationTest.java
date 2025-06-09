@@ -164,10 +164,9 @@ public class KafkaSpoutReactivationTest {
             KafkaSpoutMessageId msgId = emitOne();
             spout.ack(msgId);
         }
-
         spout.deactivate();
 
-        Map<String, Metric> offsetMetric = spout.getKafkaOffsetMetricManager().getKafkaOffsetPartitionAndTopicMetrics().getMetrics();
+        Map<String, Metric> offsetMetric = spout.getKafkaOffsetMetricManager().getTopicPartitionMetricsMap().get(new TopicPartition(SingleTopicKafkaSpoutConfiguration.TOPIC ,0)).getMetrics();
         Long partitionLag = (Long) ((Gauge) offsetMetric.get(SingleTopicKafkaSpoutConfiguration.TOPIC + "/partition_0/spoutLag")).getValue();
         Long spoutLag = (Long) ((Gauge) offsetMetric.get(SingleTopicKafkaSpoutConfiguration.TOPIC + "/totalSpoutLag")).getValue();
         assertThat(partitionLag, is(5L));
