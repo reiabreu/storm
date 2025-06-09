@@ -18,28 +18,24 @@
 
 package org.apache.storm.kafka.spout.metrics2;
 
+import static org.apache.storm.kafka.spout.metrics2.KafkaOffsetUtil.getBeginningOffsets;
+import static org.apache.storm.kafka.spout.metrics2.KafkaOffsetUtil.getEndOffsets;
+
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricSet;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
-
 import org.apache.kafka.clients.admin.Admin;
-import org.apache.kafka.clients.admin.ListOffsetsResult;
-import org.apache.kafka.clients.admin.OffsetSpec;
-import org.apache.kafka.common.KafkaFuture;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.kafka.common.errors.RetriableException;
 import org.apache.storm.kafka.spout.internal.OffsetManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.storm.kafka.spout.metrics2.KafkaOffsetUtil.*;
+
+
 
 /**
  * Partition level metrics.
