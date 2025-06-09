@@ -55,6 +55,7 @@ public class KafkaOffsetMetricManager<K, V> {
     }
 
     public void registerMetricsForNewTopicPartitions(Set<TopicPartition> newAssignment) {
+
         for (TopicPartition topicPartition : newAssignment) {
             if (!topicPartitionMetricsMap.containsKey(topicPartition)) {
                 LOG.info("Registering metric for topicPartition: {}", topicPartition);
@@ -62,13 +63,13 @@ public class KafkaOffsetMetricManager<K, V> {
                 String topic = topicPartition.topic();
                 KafkaOffsetTopicMetrics topicMetrics = topicMetricsMap.get(topic);
                 if (topicMetrics == null) {
-                    topicMetrics = new KafkaOffsetTopicMetrics(topic);
+                    topicMetrics = new KafkaOffsetTopicMetrics(topic,offsetManagerSupplier, adminSupplier, newAssignment);
                     topicMetricsMap.put(topic, topicMetrics);
                     topologyContext.registerMetricSet("kafkaOffset", topicMetrics);
                 }
 
                 KafkaOffsetPartitionMetrics topicPartitionMetricSet
-                    = new KafkaOffsetPartitionMetrics<>(offsetManagerSupplier, adminSupplier, topicPartition, topicMetrics);
+                    = new KafkaOffsetPartitionMetrics<>(offsetManagerSupplier, adminSupplier, topicPartition);
                 topicPartitionMetricsMap.put(topicPartition, topicPartitionMetricSet);
                 topologyContext.registerMetricSet("kafkaOffset", topicPartitionMetricSet);
             }
