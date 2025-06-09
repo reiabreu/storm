@@ -163,30 +163,27 @@ public class KafkaOffsetTopicMetrics implements MetricSet {
             return totalLatestCompletedOffset;
         };
 
-        Gauge<Long> totalRecordsInPartitionsGauge = new Gauge<>() {
-            @Override
-            public Long getValue() {
-                Long totalRecordsInPartitions = 0L;
-                for (TopicPartition topicPartition : assignment) {
-                    String topicOfPartition = topicPartition.topic();
-                    if (topicOfPartition.equals(topic)) {
-                        Map<TopicPartition, Long> endOffsets = getEndOffsets(Collections.singleton(topicPartition), adminSupplier);
-                        if (endOffsets == null || endOffsets.isEmpty()) {
-                            LOG.error("Failed to get endOffsets from Kafka for topic partitions: {}.", topicPartition);
-                            return 0L;
-                        }
-                        Map<TopicPartition, Long> beginningOffsets = getBeginningOffsets(Collections.singleton(topicPartition), adminSupplier);
-                        if (beginningOffsets == null || beginningOffsets.isEmpty()) {
-                            LOG.error("Failed to get beginningOffsets from Kafka for topic partitions: {}.", topicPartition);
-                            return 0L;
-                        }
-                        // add value to topic level metric
-                        Long ret = endOffsets.get(topicPartition) - beginningOffsets.get(topicPartition);
-                        totalRecordsInPartitions += ret;
+        Gauge<Long> totalRecordsInPartitionsGauge = () -> {
+            Long totalRecordsInPartitions = 0L;
+            for (TopicPartition topicPartition : assignment) {
+                String topicOfPartition = topicPartition.topic();
+                if (topicOfPartition.equals(topic)) {
+                    Map<TopicPartition, Long> endOffsets = getEndOffsets(Collections.singleton(topicPartition), adminSupplier);
+                    if (endOffsets == null || endOffsets.isEmpty()) {
+                        LOG.error("Failed to get endOffsets from Kafka for topic partitions: {}.", topicPartition);
+                        return 0L;
                     }
+                    Map<TopicPartition, Long> beginningOffsets = getBeginningOffsets(Collections.singleton(topicPartition), adminSupplier);
+                    if (beginningOffsets == null || beginningOffsets.isEmpty()) {
+                        LOG.error("Failed to get beginningOffsets from Kafka for topic partitions: {}.", topicPartition);
+                        return 0L;
+                    }
+                    // add value to topic level metric
+                    Long ret = endOffsets.get(topicPartition) - beginningOffsets.get(topicPartition);
+                    totalRecordsInPartitions += ret;
                 }
-                return totalRecordsInPartitions;
             }
+            return totalRecordsInPartitions;
         };
 
         metrics.put(topic + "/" + "totalSpoutLag", totalSpoutLagGauge);
